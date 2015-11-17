@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<head>
+<title>grub2.git - grub2</title>
+<meta name='generator' content='cgit v0.11.2'/>
+<meta name='robots' content='index, nofollow'/>
+<link rel='stylesheet' type='text/css' href='/cgit-data/cgit.css'/>
+<link rel='shortcut icon' href='/favicon.ico'/>
+<link rel='alternate' title='Atom feed' href='http://pkgs.fedoraproject.org/cgit/grub2.git/atom/0073-Fix-race-in-EFI-validation.patch?h=master' type='application/atom+xml'/>
+<link rel='vcs-git' href='git://pkgs.fedoraproject.org/grub2.git' title='grub2.git Git repository'/>
+<link rel='vcs-git' href='ssh://pkgs.fedoraproject.org/grub2.git' title='grub2.git Git repository'/>
+<link rel='vcs-git' href='http://pkgs.fedoraproject.org/git/grub2.git' title='grub2.git Git repository'/>
+</head>
+<body>
+<script src="https://apps.fedoraproject.org/fedmenu/js/jquery-1.11.2.min.js"></script>
+<script src="https://apps.fedoraproject.org/fedmenu/js/fedmenu.js"></script>
+
+<script>
+    var base = 'https://apps.fedoraproject.org/';
+    var tokens = window.location.href.split('/');
+  var repo = null;
+  if (tokens.length > 4 && tokens[4] != '') {
+    repo = tokens[4].split('.')[0];
+  }
+  fedmenu({
+      'url': base + 'js/data.js',
+      'mimeType': 'application/javascript',
+      'position': 'bottom-right',
+      'package': repo,
+  });
+</script>
+<div id='cgit'><table id='header'>
+<tr>
+<td class='logo' rowspan='2'><a href='/cgit/'><img src='/cgit-data/cgit.png' alt='cgit logo'/></a></td>
+<td class='main'><a href='/cgit/'>index</a> : <a title='grub2.git' href='/cgit/grub2.git/'>grub2.git</a></td><td class='form'><form method='get' action=''>
+<select name='h' onchange='this.form.submit();'>
+<option value='el5'>el5</option>
+<option value='el6'>el6</option>
+<option value='f10'>f10</option>
+<option value='f11'>f11</option>
+<option value='f12'>f12</option>
+<option value='f13'>f13</option>
+<option value='f14'>f14</option>
+<option value='f15'>f15</option>
+<option value='f16'>f16</option>
+<option value='f17'>f17</option>
+<option value='f18'>f18</option>
+<option value='f19'>f19</option>
+<option value='f20'>f20</option>
+<option value='f21'>f21</option>
+<option value='f22'>f22</option>
+<option value='f23'>f23</option>
+<option value='f9'>f9</option>
+<option value='master' selected='selected'>master</option>
+</select> <input type='submit' name='' value='switch'/></form></td></tr>
+<tr><td class='sub'>grub2</td><td class='sub right'>Jesse Keating</td></tr></table>
+<table class='tabs'><tr><td>
+<a href='/cgit/grub2.git/'>summary</a><a href='/cgit/grub2.git/refs/'>refs</a><a href='/cgit/grub2.git/log/0073-Fix-race-in-EFI-validation.patch'>log</a><a class='active' href='/cgit/grub2.git/tree/0073-Fix-race-in-EFI-validation.patch'>tree</a><a href='/cgit/grub2.git/commit/0073-Fix-race-in-EFI-validation.patch'>commit</a><a href='/cgit/grub2.git/diff/0073-Fix-race-in-EFI-validation.patch'>diff</a><a href='/cgit/grub2.git/stats/0073-Fix-race-in-EFI-validation.patch'>stats</a></td><td class='form'><form class='right' method='get' action='/cgit/grub2.git/log/0073-Fix-race-in-EFI-validation.patch'>
+<select name='qt'>
+<option value='grep'>log msg</option>
+<option value='author'>author</option>
+<option value='committer'>committer</option>
+<option value='range'>range</option>
+</select>
+<input class='txt' type='text' size='10' name='q' value=''/>
+<input type='submit' value='search'/>
+</form>
+</td></tr></table>
+<div class='path'>path: <a href='/cgit/grub2.git/tree/'>root</a>/<a href='/cgit/grub2.git/tree/0073-Fix-race-in-EFI-validation.patch'>0073-Fix-race-in-EFI-validation.patch</a></div><div class='content'>blob: 2ccb6ca6497410cbf2ae10b74bef9d6658e5953f (<a href='/cgit/grub2.git/plain/0073-Fix-race-in-EFI-validation.patch'>plain</a>)
+<table summary='blob content' class='blob'>
+<tr><td class='linenumbers'><pre><a id='n1' href='#n1'>1</a>
+<a id='n2' href='#n2'>2</a>
+<a id='n3' href='#n3'>3</a>
+<a id='n4' href='#n4'>4</a>
+<a id='n5' href='#n5'>5</a>
+<a id='n6' href='#n6'>6</a>
+<a id='n7' href='#n7'>7</a>
+<a id='n8' href='#n8'>8</a>
+<a id='n9' href='#n9'>9</a>
+<a id='n10' href='#n10'>10</a>
+<a id='n11' href='#n11'>11</a>
+<a id='n12' href='#n12'>12</a>
+<a id='n13' href='#n13'>13</a>
+<a id='n14' href='#n14'>14</a>
+<a id='n15' href='#n15'>15</a>
+<a id='n16' href='#n16'>16</a>
+<a id='n17' href='#n17'>17</a>
+<a id='n18' href='#n18'>18</a>
+<a id='n19' href='#n19'>19</a>
+<a id='n20' href='#n20'>20</a>
+<a id='n21' href='#n21'>21</a>
+<a id='n22' href='#n22'>22</a>
+<a id='n23' href='#n23'>23</a>
+<a id='n24' href='#n24'>24</a>
+<a id='n25' href='#n25'>25</a>
+<a id='n26' href='#n26'>26</a>
+<a id='n27' href='#n27'>27</a>
+<a id='n28' href='#n28'>28</a>
+<a id='n29' href='#n29'>29</a>
+<a id='n30' href='#n30'>30</a>
+<a id='n31' href='#n31'>31</a>
+<a id='n32' href='#n32'>32</a>
+<a id='n33' href='#n33'>33</a>
+<a id='n34' href='#n34'>34</a>
+<a id='n35' href='#n35'>35</a>
+<a id='n36' href='#n36'>36</a>
+<a id='n37' href='#n37'>37</a>
+<a id='n38' href='#n38'>38</a>
+<a id='n39' href='#n39'>39</a>
+<a id='n40' href='#n40'>40</a>
+<a id='n41' href='#n41'>41</a>
+<a id='n42' href='#n42'>42</a>
+<a id='n43' href='#n43'>43</a>
+<a id='n44' href='#n44'>44</a>
+<a id='n45' href='#n45'>45</a>
+<a id='n46' href='#n46'>46</a>
+<a id='n47' href='#n47'>47</a>
+<a id='n48' href='#n48'>48</a>
+<a id='n49' href='#n49'>49</a>
+<a id='n50' href='#n50'>50</a>
+<a id='n51' href='#n51'>51</a>
+<a id='n52' href='#n52'>52</a>
+<a id='n53' href='#n53'>53</a>
+<a id='n54' href='#n54'>54</a>
+<a id='n55' href='#n55'>55</a>
+<a id='n56' href='#n56'>56</a>
+<a id='n57' href='#n57'>57</a>
+<a id='n58' href='#n58'>58</a>
+<a id='n59' href='#n59'>59</a>
+<a id='n60' href='#n60'>60</a>
+<a id='n61' href='#n61'>61</a>
+<a id='n62' href='#n62'>62</a>
+<a id='n63' href='#n63'>63</a>
+<a id='n64' href='#n64'>64</a>
+<a id='n65' href='#n65'>65</a>
+<a id='n66' href='#n66'>66</a>
+<a id='n67' href='#n67'>67</a>
+<a id='n68' href='#n68'>68</a>
+<a id='n69' href='#n69'>69</a>
+<a id='n70' href='#n70'>70</a>
+<a id='n71' href='#n71'>71</a>
+<a id='n72' href='#n72'>72</a>
+<a id='n73' href='#n73'>73</a>
+<a id='n74' href='#n74'>74</a>
+<a id='n75' href='#n75'>75</a>
+<a id='n76' href='#n76'>76</a>
+<a id='n77' href='#n77'>77</a>
+<a id='n78' href='#n78'>78</a>
+<a id='n79' href='#n79'>79</a>
+<a id='n80' href='#n80'>80</a>
+<a id='n81' href='#n81'>81</a>
+<a id='n82' href='#n82'>82</a>
+<a id='n83' href='#n83'>83</a>
+<a id='n84' href='#n84'>84</a>
+<a id='n85' href='#n85'>85</a>
+<a id='n86' href='#n86'>86</a>
+<a id='n87' href='#n87'>87</a>
+<a id='n88' href='#n88'>88</a>
+<a id='n89' href='#n89'>89</a>
+<a id='n90' href='#n90'>90</a>
+<a id='n91' href='#n91'>91</a>
+<a id='n92' href='#n92'>92</a>
+<a id='n93' href='#n93'>93</a>
+<a id='n94' href='#n94'>94</a>
+<a id='n95' href='#n95'>95</a>
+<a id='n96' href='#n96'>96</a>
+<a id='n97' href='#n97'>97</a>
+</pre></td>
+<td class='lines'><pre><code>From 62b86cdfaf57a098ba7c6d8b08df161aa294e7a3 Mon Sep 17 00:00:00 2001
+From: Matthew Garrett &lt;mjg59@coreos.com&gt;
+Date: Tue, 14 Jul 2015 16:58:51 -0700
+Subject: [PATCH 73/74] Fix race in EFI validation
+
+---
+ grub-core/loader/i386/efi/linux.c | 44 ++++++++++-----------------------------
+ 1 file changed, 11 insertions(+), 33 deletions(-)
+
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index e5b7785..7ccf32d 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -154,7 +154,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   grub_file_t file = 0;
+   struct linux_kernel_header lh;
+   grub_ssize_t len, start, filelen;
+-  void *kernel;
++  void *kernel = NULL;
+ 
+   grub_dl_ref (my_mod);
+ 
+@@ -191,10 +191,6 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  grub_file_seek (file, 0);
+-
+-  grub_free(kernel);
+-
+   params = grub_efi_allocate_pages_max (0x3fffffff, BYTES_TO_PAGES(16384));
+ 
+   if (! params)
+@@ -203,15 +199,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  memset (params, 0, 16384);
++  grub_memset (params, 0, 16384);
+ 
+-  if (grub_file_read (file, &amp;lh, sizeof (lh)) != sizeof (lh))
+-    {
+-      if (!grub_errno)
+-	grub_error (GRUB_ERR_BAD_OS, N_("premature end of file %s"),
+-		    argv[0]);
+-      goto fail;
+-    }
++  grub_memcpy (&amp;lh, kernel, sizeof (lh));
+ 
+   if (lh.boot_flag != grub_cpu_to_le16 (0xaa55))
+     {
+@@ -271,27 +261,12 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+       goto fail;
+     }
+ 
+-  if (grub_file_seek (file, start) == (grub_off_t) -1)
+-    {
+-      grub_error (GRUB_ERR_BAD_OS, N_("premature end of file %s"),
+-		  argv[0]);
+-      goto fail;
+-    }
++  grub_memcpy (kernel_mem, (char *)kernel + start, len);
++  grub_loader_set (grub_linuxefi_boot, grub_linuxefi_unload, 0);
++  loaded=1;
+ 
+-  if (grub_file_read (file, kernel_mem, len) != len &amp;&amp; !grub_errno)
+-    {
+-      grub_error (GRUB_ERR_BAD_OS, N_("premature end of file %s"),
+-		  argv[0]);
+-    }
+-
+-  if (grub_errno == GRUB_ERR_NONE)
+-    {
+-      grub_loader_set (grub_linuxefi_boot, grub_linuxefi_unload, 0);
+-      loaded = 1;
+-      lh.code32_start = (grub_uint32_t)(grub_uint64_t) kernel_mem;
+-    }
+-
+-  memcpy(params, &amp;lh, 2 * 512);
++  lh.code32_start = (grub_uint32_t)(grub_uint64_t) kernel_mem;
++  grub_memcpy (params, &amp;lh, 2 * 512);
+ 
+   params-&gt;type_of_loader = 0x21;
+ 
+@@ -300,6 +275,9 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   if (file)
+     grub_file_close (file);
+ 
++  if (kernel)
++    grub_free (kernel);
++
+   if (grub_errno != GRUB_ERR_NONE)
+     {
+       grub_dl_unref (my_mod);
+-- 
+2.4.3
+
+</code></pre></td></tr></table>
+</div> <!-- class=content -->
+<div class='footer'>generated by <a href='http://git.zx2c4.com/cgit/about/'>cgit v0.11.2</a> at 2015-11-18 23:12:43 (GMT)</div>
+</div> <!-- id=cgit -->
+</body>
+</html>

@@ -1,0 +1,2 @@
+--disable-werror
+--with-platform=efi
