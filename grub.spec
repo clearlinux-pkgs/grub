@@ -4,7 +4,7 @@
 #
 Name     : grub
 Version  : 2.02.beta2
-Release  : 15
+Release  : 16
 URL      : http://localhost/cgit/projects/grub/snapshot/grub-2.02-beta2.tar.gz
 Source0  : http://localhost/cgit/projects/grub/snapshot/grub-2.02-beta2.tar.gz
 Summary  : No detailed summary available
