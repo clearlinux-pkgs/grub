@@ -25,7 +25,7 @@ BuildRequires : libtool-dev
 BuildRequires : m4
 BuildRequires : parted-dev
 BuildRequires : pkg-config-dev
-BuildRequires : python-dev
+
 BuildRequires : texinfo
 BuildRequires : xz-dev
 Patch1: 0001-Lower-test-timeout.patch
