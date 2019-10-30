@@ -2,12 +2,9 @@ Configure miss: getextmntent
 Configure miss: sys/mnttab.h usability
 Configure miss: sys/mnttab.h presence
 Configure miss: sys/mnttab.h
-Configure miss: struct statfs.f_fstypename
 Configure miss: struct statfs.f_mntfromname
 Configure miss: linewrap.h
-Configure miss: xlocale.h
 Configure miss: whether mbswidth is declared in <wchar.h>
-Configure miss: working re_compile_pattern
 Configure miss: x86_64-clr-linux-gnu-gcc
 Configure miss: x86_64-clr-linux-gnu-egcs
 Configure miss: x86_64-clr-linux-gnu-cc
@@ -15,9 +12,7 @@ Configure miss: x86_64-clr-linux-gnu-objcopy
 Configure miss: x86_64-clr-linux-gnu-strip
 Configure miss: x86_64-clr-linux-gnu-nm
 Configure miss: x86_64-clr-linux-gnu-ranlib
-Configure miss: whether `gcc' has `-fPIE' as default
 Configure miss: whether `gcc' has `-fPIC' as default
-Configure miss: whether `gcc' accepts `-mstack-arg-probe'
 Configure miss: if C symbols get an underscore after compilation
 Configure miss: __bswapsi2
 Configure miss: __bswapdi2

@@ -4,33 +4,38 @@
 #
 Name     : grub
 Version  : 2.02.beta2
-Release  : 19
+Release  : 20
 URL      : http://localhost/cgit/projects/grub/snapshot/grub-2.02-beta2.tar.gz
 Source0  : http://localhost/cgit/projects/grub/snapshot/grub-2.02-beta2.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : CC-BY-SA-3.0 GPL-3.0 ICU
-Requires: grub-bin
-Requires: grub-data
-Requires: grub-doc
+Requires: grub-bin = %{version}-%{release}
+Requires: grub-data = %{version}-%{release}
+Requires: grub-license = %{version}-%{release}
+Requires: grub-man = %{version}-%{release}
 BuildRequires : automake
 BuildRequires : automake-dev
 BuildRequires : bison
 BuildRequires : flex
 BuildRequires : freetype-dev
 BuildRequires : gettext-bin
+BuildRequires : glibc-locale
 BuildRequires : help2man
 BuildRequires : libtool
 BuildRequires : libtool-dev
 BuildRequires : m4
 BuildRequires : parted-dev
 BuildRequires : pkg-config-dev
-
 BuildRequires : texinfo
+BuildRequires : util-linux
 BuildRequires : xz-dev
 Patch1: 0001-Lower-test-timeout.patch
 Patch2: 0003-Add-support-for-linuxefi.patch
 Patch3: 0004-Use-linuxefi-and-initrdefi-where-appropriate.patch
+Patch4: 0001-Add-sysmacros-header.patch
+Patch5: 0002-Add-no-PIE-linker-option.patch
+Patch6: 0003-Disable-PIC-compiler-switch.patch
 
 %description
 This is GRUB 2, the second version of the GRand Unified Bootloader.
@@ -40,7 +45,8 @@ robust, more powerful, and more portable.
 %package bin
 Summary: bin components for the grub package.
 Group: Binaries
-Requires: grub-data
+Requires: grub-data = %{version}-%{release}
+Requires: grub-license = %{version}-%{release}
 
 %description bin
 bin components for the grub package.
@@ -57,6 +63,7 @@ data components for the grub package.
 %package doc
 Summary: doc components for the grub package.
 Group: Documentation
+Requires: grub-man = %{version}-%{release}
 
 %description doc
 doc components for the grub package.
@@ -70,34 +77,62 @@ Group: Default
 extras components for the grub package.
 
 
+%package license
+Summary: license components for the grub package.
+Group: Default
+
+%description license
+license components for the grub package.
+
+
+%package man
+Summary: man components for the grub package.
+Group: Default
+
+%description man
+man components for the grub package.
+
+
 %prep
 %setup -q -n grub-2.02-beta2
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1510692989
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1572397096
+export GCC_IGNORE_WERROR=1
 export CFLAGS="-O3 -g -fopt-info-vec "
 unset LDFLAGS
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
 %autogen --disable-static --disable-werror \
 --with-platform=efi
-make V=1  %{?_smp_mflags}
+make  %{?_smp_mflags}
 
 %check
-export LANG=C
+export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1510692989
+export SOURCE_DATE_EPOCH=1572397096
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/grub
+cp %{_builddir}/grub-2.02-beta2/COPYING %{buildroot}/usr/share/package-licenses/grub/8624bcdae55baeef00cd11d5dfcfa60f68710a02
+cp %{_builddir}/grub-2.02-beta2/themes/starfield/COPYING.CC-BY-SA-3.0 %{buildroot}/usr/share/package-licenses/grub/076b57c86de95355c87b637dee9ff4f9af965c11
+cp %{_builddir}/grub-2.02-beta2/unicode/COPYING %{buildroot}/usr/share/package-licenses/grub/3ee7111886433f400304ccf371385bc376b4e0a1
 %make_install
 
 %files
@@ -617,7 +652,6 @@ rm -rf %{buildroot}
 
 %files bin
 %defattr(-,root,root,-)
-%exclude /usr/bin/grub-mkfont
 /usr/bin/grub-bios-setup
 /usr/bin/grub-editenv
 /usr/bin/grub-file
@@ -649,11 +683,44 @@ rm -rf %{buildroot}
 /usr/share/grub/grub-mkconfig_lib
 
 %files doc
-%defattr(-,root,root,-)
+%defattr(0644,root,root,0755)
 %doc /usr/share/info/*
-%doc /usr/share/man/man1/*
-%doc /usr/share/man/man8/*
 
 %files extras
 %defattr(-,root,root,-)
 /usr/bin/grub-mkfont
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/grub/076b57c86de95355c87b637dee9ff4f9af965c11
+/usr/share/package-licenses/grub/3ee7111886433f400304ccf371385bc376b4e0a1
+/usr/share/package-licenses/grub/8624bcdae55baeef00cd11d5dfcfa60f68710a02
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/grub-editenv.1
+/usr/share/man/man1/grub-file.1
+/usr/share/man/man1/grub-fstest.1
+/usr/share/man/man1/grub-glue-efi.1
+/usr/share/man/man1/grub-kbdcomp.1
+/usr/share/man/man1/grub-macbless.1
+/usr/share/man/man1/grub-menulst2cfg.1
+/usr/share/man/man1/grub-mkfont.1
+/usr/share/man/man1/grub-mkimage.1
+/usr/share/man/man1/grub-mklayout.1
+/usr/share/man/man1/grub-mknetdir.1
+/usr/share/man/man1/grub-mkpasswd-pbkdf2.1
+/usr/share/man/man1/grub-mkrelpath.1
+/usr/share/man/man1/grub-mkrescue.1
+/usr/share/man/man1/grub-mkstandalone.1
+/usr/share/man/man1/grub-render-label.1
+/usr/share/man/man1/grub-script-check.1
+/usr/share/man/man1/grub-syslinux2cfg.1
+/usr/share/man/man8/grub-bios-setup.8
+/usr/share/man/man8/grub-install.8
+/usr/share/man/man8/grub-mkconfig.8
+/usr/share/man/man8/grub-ofpathname.8
+/usr/share/man/man8/grub-probe.8
+/usr/share/man/man8/grub-reboot.8
+/usr/share/man/man8/grub-set-default.8
+/usr/share/man/man8/grub-sparc64-setup.8

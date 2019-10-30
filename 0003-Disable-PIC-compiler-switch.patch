@@ -1,0 +1,31 @@
+From b14f48eda94829fdf99e0d170af9dfd531fc677d Mon Sep 17 00:00:00 2001
+From: Brandon Hong <brandon.hong@intel.com>
+Date: Wed, 30 Oct 2019 08:46:18 +0800
+Subject: [PATCH 3/3] Disable PIC compiler switch
+
+ClearLinux RPM build environment enables -fPIC compiler switch by default
+however, Grub intends PIC for limited environments like MIPS or CLang.
+Refer configure.ac grub_CHECK_PIC section for the details.
+
+Signed-off-by: Brandon Hong <brandon.hong@intel.com>
+---
+ grub-core/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/Makefile.am b/grub-core/Makefile.am
+index 1b3142d..ef1967a 100644
+--- a/grub-core/Makefile.am
++++ b/grub-core/Makefile.am
+@@ -26,6 +26,9 @@ CFLAGS_LIBRARY += $(CFLAGS_PLATFORM) -fno-builtin
+ CPPFLAGS_LIBRARY += $(CPPFLAGS_PLATFORM)
+ CCASFLAGS_LIBRARY += $(CCASFLAGS_PLATFORM)
+ 
++# Override ClearLinux's default -fPIC compiler switch.
++CFLAGS += -fno-PIC
++
+ build-grub-pep2elf: $(top_srcdir)/util/grub-pe2elf.c $(top_srcdir)/grub-core/kern/emu/misc.c $(top_srcdir)/util/misc.c
+ 	$(BUILD_CC) -o $@ -I$(top_srcdir)/include $(BUILD_CFLAGS) $(BUILD_CPPFLAGS) -DGRUB_BUILD=1 -DGRUB_TARGET_WORDSIZE=64 -DGRUB_UTIL=1 -DGRUB_BUILD_PROGRAM_NAME=\"build-grub-pep2elf\" $^
+ 
+-- 
+2.23.0
+

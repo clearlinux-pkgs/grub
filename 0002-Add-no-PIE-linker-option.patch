@@ -1,0 +1,36 @@
+From f64c45cfa73967fa1ab60137ef292571c249ece9 Mon Sep 17 00:00:00 2001
+From: Brandon Hong <brandon.hong@intel.com>
+Date: Fri, 18 Oct 2019 16:07:56 +0800
+Subject: [PATCH 2/3] Add no-PIE linker option
+
+Linker doesn't allow -r and -pie option together.
+"/usr/bin/ld: -r and -pie may not be used together"
+
+Signed-off-by: Brandon Hong <brandon.hong@intel.com>
+---
+ conf/Makefile.common | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/conf/Makefile.common b/conf/Makefile.common
+index e4c301f..af5d1b8 100644
+--- a/conf/Makefile.common
++++ b/conf/Makefile.common
+@@ -42,13 +42,13 @@ BUILD_CPPFLAGS += $(CPPFLAGS_DEFAULT)
+ LDADD_KERNEL = $(TARGET_LIBGCC)
+ 
+ CFLAGS_KERNEL = $(CFLAGS_CPU) $(CFLAGS_PLATFORM) -ffreestanding
+-LDFLAGS_KERNEL = $(LDFLAGS_CPU) $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC) $(TARGET_LDFLAGS_STATIC_LIBGCC)
++LDFLAGS_KERNEL = $(LDFLAGS_CPU) $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC) $(TARGET_LDFLAGS_STATIC_LIBGCC) -no-pie
+ CPPFLAGS_KERNEL = $(CPPFLAGS_CPU) $(CPPFLAGS_PLATFORM) -DGRUB_KERNEL=1
+ CCASFLAGS_KERNEL = $(CCASFLAGS_CPU) $(CCASFLAGS_PLATFORM)
+ STRIPFLAGS_KERNEL = -R .rel.dyn -R .reginfo -R .note -R .comment -R .drectve -R .note.gnu.gold-version
+ 
+ CFLAGS_MODULE = $(CFLAGS_CPU) $(CFLAGS_PLATFORM) -ffreestanding
+-LDFLAGS_MODULE = $(LDFLAGS_CPU) $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC) -Wl,-r,-d
++LDFLAGS_MODULE = $(LDFLAGS_CPU) $(LDFLAGS_PLATFORM) -nostdlib $(TARGET_LDFLAGS_OLDMAGIC) -Wl,-r,-d -no-pie
+ CPPFLAGS_MODULE = $(CPPFLAGS_CPU) $(CPPFLAGS_PLATFORM)
+ CCASFLAGS_MODULE = $(CCASFLAGS_CPU) $(CCASFLAGS_PLATFORM)
+ 
+-- 
+2.23.0
+
